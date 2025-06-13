@@ -1,4 +1,5 @@
 import {Request, Response, NextFunction } from "express";
+import { APIConfig } from "../config.js"
 
 export function middlewareLogResponses(req: Request, res: Response, next: NextFunction) {
   res.on("finish", () => {
@@ -9,5 +10,10 @@ export function middlewareLogResponses(req: Request, res: Response, next: NextFu
     }
   });
 
+  next();
+}
+
+export function middlewareMetricsInc(_: Request, __: Response, next: NextFunction) {
+  APIConfig.fileserverHits++
   next();
 }
