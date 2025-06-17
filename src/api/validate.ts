@@ -13,7 +13,18 @@ export async function handlerValidate(req: Request, res: Response) {
         return;
     }
 
+    const cleanedBody = cleanBody(params.body)
+
     respondWithJSON(res, 200, {
-        valid: true,
+        cleanedBody: cleanedBody,
     })
+}
+
+function cleanBody(body: string) {
+    const badWords = ["kerfuffle" , "sharbert" , "fornax"]
+    const bodyArray = body.split(" ")
+    const cleanedArray = bodyArray.map((word) =>
+        badWords.includes(word.toLowerCase()) ? "****" : word    
+    );
+    return cleanedArray.join(" ")
 }
