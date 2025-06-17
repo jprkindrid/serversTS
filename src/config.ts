@@ -1,20 +1,42 @@
-process.loadEnvFile()
+import type { MigrationConfig } from "drizzle-orm/migrator";
+
+type Config = {
+  api: APIConfig;
+  db: DBConfig;
+};
 
 type APIConfig = {
-    fileserverHits: number;
-    dbURL: string;
-}
+  fileServerHits: number;
+  port: number;
+};
 
-const dbURL = process.env.DB_URL ?? "";
+type DBConfig = {
+  url: string;
+  migrationConfig: MigrationConfig;
+};
 
-export const APIConfig: APIConfig = {
-    fileserverHits: 0,
-    dbURL: envOrThrow(dbURL)
-}
+process.loadEnvFile();
+
+const migrationConfig: MigrationConfig = {
+  migrationsFolder: "./src/db/migrations",
+};
+
+export const config: Config = {
+  api: {
+    fileServerHits: 0,
+    port: Number(envOrThrow("PORT")),
+  },
+  db: {
+    url: envOrThrow("DB_URL"),
+    migrationConfig: migrationConfig,
+  },
+};
 
 function envOrThrow(key: string) {
-    if (key === "") {
-        throw new Error("required paramater missing from env file")
-    }
-    return key
+  const value = process.env[key];
+  if (!value) {
+    throw new Error(`Environment variable ${key} is not set`);
+  }
+  return value;
 }
+

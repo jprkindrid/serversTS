@@ -5,6 +5,7 @@ import { middlewareErrorHandler, middlewareLogResponses, middlewareMetricsInc } 
 import { handlerMetrics } from "./api/metrics.js";
 import { handlerReset } from "./api/reset.js";
 import { handlerValidate } from "./api/validate.js";
+import { handlerUsers } from "./api/users.js";
 
 const app = express();
 const PORT = 8080;
@@ -27,7 +28,9 @@ app.post("/admin/reset", (req, res, next) => {
 app.post("/api/validate_chirp", (req, res, next) => {
     Promise.resolve(handlerValidate(req, res)).catch(next)
 });
-
+app.post("/api/users", (req, res, next) => {
+    Promise.resolve(handlerUsers(req, res)).catch(next)
+});
 
 
 app.use(middlewareErrorHandler)

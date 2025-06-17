@@ -1,8 +1,8 @@
 import type { Request, Response } from "express"
-import { APIConfig } from "../config.js"
+import { config } from "../config.js"
 
 export async function handlerReset(_: Request, res: Response) {
-  APIConfig.fileserverHits = 0
-  res.write("Fileserver hits reset to 0");
+  config.api.fileServerHits = 0
+  res.write("Fileserver hits reset to 0, all users deleted");
   res.end();
 }
