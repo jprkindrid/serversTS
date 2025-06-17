@@ -13,14 +13,18 @@ export async function handlerUsers(req: Request, res: Response) {
         throw new BadRequestError("Bad Request")
     }
 
-    // const user = await createUser({
-    //     email: params.email
-    // })
+    const user = await createUser({
+        email: params.email
+    })
+
+    if (!user) {
+    throw new Error("Could not create user");
+    }
 
     respondWithJSON(res, 201, {
-        // "id": user.id,
-        // "createdAt": user.createdAt,
-        // "updatedAt": user.updatedAt,
+        "id": user.id,
+        "createdAt": user.createdAt,
+        "updatedAt": user.updatedAt,
         "email": params.email
     })
 }
