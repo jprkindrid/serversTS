@@ -9,8 +9,7 @@ export async function handlerValidate(req: Request, res: Response) {
     const params: jsonParams = req.body;
     const maxLength = 140;
     if (params.body.length > maxLength) {
-        respondWithError(res, 400, "Chirp is too long");
-        return;
+        throw new Error("Chirp is too long")
     }
 
     const cleanedBody = cleanBody(params.body)
