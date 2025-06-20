@@ -4,7 +4,7 @@ import { handlerReadiness } from "./api/readiness.js";
 import { middlewareErrorHandler, middlewareLogResponses, middlewareMetricsInc } from "./api/middleware.js";
 import { handlerMetrics } from "./api/metrics.js";
 import { handlerReset } from "./api/reset.js";
-import { handlerValidate } from "./api/validate.js";
+import { handlerChirps } from "./api/chirps.js";
 import { handlerUsers } from "./api/users.js";
 
 const app = express();
@@ -25,8 +25,8 @@ app.get("/admin/metrics", (req, res, next) => {
 app.post("/admin/reset", (req, res, next) => {
     Promise.resolve(handlerReset(req, res)).catch(next)
 });
-app.post("/api/validate_chirp", (req, res, next) => {
-    Promise.resolve(handlerValidate(req, res)).catch(next)
+app.post("/api/chirps", (req, res, next) => {
+    Promise.resolve(handlerChirps(req, res)).catch(next)
 });
 app.post("/api/users", (req, res, next) => {
     Promise.resolve(handlerUsers(req, res)).catch(next)
