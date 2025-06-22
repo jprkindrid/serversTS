@@ -8,9 +8,12 @@ export const users = pgTable("users", {
     .defaultNow()
     .$onUpdate(() => new Date()),
   email: varchar("email", { length: 256 }).unique().notNull(),
+  passwordHash: varchar("password_hash", { length: 256 }).unique().notNull(),
 });
 
 export type NewUser = typeof users.$inferInsert;
+export type User = typeof users.$inferSelect;
+export type UserSafe = Omit<typeof users.$inferInsert, "passwordHash">;
 
 export const chirps = pgTable("chirps", {
   id: uuid("id").primaryKey().defaultRandom(),

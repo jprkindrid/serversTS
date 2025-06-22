@@ -2,19 +2,25 @@ import { Request, Response } from "express";
 import { respondWithError, respondWithJSON } from "./json.js";
 import { createUser } from "../db/queries/users.js";
 import { BadRequestError } from "./errors.js";
+import { hashPassword } from "../auth/auth.js";
 
 export async function handlerUsers(req: Request, res: Response) {
     type jsonParams = {
         email: string;
+        password: string;
     }
+
     const params: jsonParams = req.body;
 
-    if (!params.email) {
+    if (!params.email || !params.password) {
         throw new BadRequestError("Bad Request")
     }
 
+    const hashedPassword = hashPassword(params.password)
+
     const user = await createUser({
-        email: params.email
+        email: params.email,
+        passwordHash: hashedPassword,
     })
 
     if (!user) {

@@ -15,6 +15,13 @@
       "when": 1750376880970,
       "tag": "0001_safe_shooting_star",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1750555725272,
+      "tag": "0002_stale_adam_destine",
+      "breakpoints": true
     }
   ]
 }
