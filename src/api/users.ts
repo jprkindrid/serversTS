@@ -3,6 +3,9 @@ import { respondWithError, respondWithJSON } from "./json.js";
 import { createUser } from "../db/queries/users.js";
 import { BadRequestError } from "./errors.js";
 import { hashPassword } from "../auth/auth.js";
+import { NewUser } from "../db/schema.js";
+
+type UserResponse = Omit<NewUser, "passwordHash">;
 
 export async function handlerUsers(req: Request, res: Response) {
     type jsonParams = {
@@ -16,7 +19,7 @@ export async function handlerUsers(req: Request, res: Response) {
         throw new BadRequestError("Bad Request")
     }
 
-    const hashedPassword = hashPassword(params.password)
+    const hashedPassword = await hashPassword(params.password)
 
     const user = await createUser({
         email: params.email,
@@ -28,9 +31,9 @@ export async function handlerUsers(req: Request, res: Response) {
     }
 
     respondWithJSON(res, 201, {
-        "id": user.id,
-        "createdAt": user.createdAt,
-        "updatedAt": user.updatedAt,
-        "email": params.email
-    })
+        id: user.id,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+        email: params.email
+    } satisfies UserResponse)
 }
