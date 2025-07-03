@@ -2,6 +2,7 @@ import bcrypt from "bcrypt";
 import { JwtPayload } from "jsonwebtoken";
 import jwt from "jsonwebtoken";
 import { UnauthorizedError } from "../api/errors.js"
+import { Request } from "express";
 
 const TOKEN_ISSUER = "chirpy"
 
@@ -48,4 +49,25 @@ export function validateJWT(tokenString: string, secret: string): string {
     }
 
     return validatedToken.sub
+}
+
+export function getBearerToken(req: Request): string {
+    const authHeader = req.get("Authorization")
+    if (!authHeader) {
+        throw new UnauthorizedError("missing authorization header")
+    }
+
+    const authSplit: string[] = authHeader.split(" ")
+
+    if (authSplit.length !== 2){
+        throw new UnauthorizedError("invalid authorization header")
+    }
+
+    if (authSplit[0].toLowerCase() !== "bearer") {
+        throw new UnauthorizedError("invalid authorization header, missing 'Bearer'")
+    }
+
+    const token = authSplit[1]
+
+    return token
 }

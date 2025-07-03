@@ -2,19 +2,22 @@ import { Request, Response } from "express";
 import { respondWithError, respondWithJSON } from "./json.js";
 import { BadRequestError } from "./errors.js";
 import { createChirp, getAllChirps, getChirpyById } from "../db/queries/chirps.js";
-import { Chirp } from "src/db/schema.js";
+import { Chirp } from "../db/schema.js";
+import { getBearerToken, validateJWT } from "../auth/auth.js";
+import { config } from "../config.js";
 
 export async function handlerChirps(req: Request, res: Response) {
     type jsonParams = {
         body: string;
-        userId: string;
     }
 
     const params: jsonParams = req.body;
     const cleanedBody = validateBody(params.body)
+    const JWTToken = getBearerToken(req)
+    const userID = validateJWT(JWTToken, config.api.JWTSecret)
     const chirp = await createChirp({
         body: cleanedBody,
-        userId: params.userId,
+        userId: userID,
     })
 
     respondWithJSON(res, 201, chirp)
