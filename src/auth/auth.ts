@@ -3,6 +3,7 @@ import { JwtPayload } from "jsonwebtoken";
 import jwt from "jsonwebtoken";
 import { UnauthorizedError } from "../api/errors.js"
 import { Request } from "express";
+import { randomBytes } from "crypto";
 
 const TOKEN_ISSUER = "chirpy"
 
@@ -19,7 +20,7 @@ export async function comparePasswordHash(password: string, hash: string): Promi
 
     type payload = Pick<JwtPayload, "iss" | "sub" | "iat" | "exp">;
 
-export function makeJWT(userID: string, expiresIn: number, secret: string) {
+export function makeAccessJWT(userID: string, expiresIn: number, secret: string) {
 
     const iat = Math.floor(Date.now() / 1000);
     const tokenPayload: payload = {
@@ -70,4 +71,8 @@ export function getBearerToken(req: Request): string {
     const token = authSplit[1]
 
     return token
+}
+
+export function makeRefreshToken() {
+    return randomBytes(32).toString('hex')
 }

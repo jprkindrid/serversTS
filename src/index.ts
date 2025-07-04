@@ -41,6 +41,12 @@ app.post("/api/users", (req, res, next) => {
 app.post("/api/login", (req, res, next) => {
     Promise.resolve(handlerLogin(req, res)).catch(next)
 });
+app.post("/api/refresh", (req, res, next) => {
+    Promise.resolve(handlerLogin(req, res)).catch(next)
+});
+app.post("/api/revoke", (req, res, next) => {
+    Promise.resolve(handlerLogin(req, res)).catch(next)
+});
 
 
 app.use(middlewareErrorHandler)

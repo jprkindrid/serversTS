@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll } from "vitest";
-import { makeJWT, validateJWT } from "./auth";
+import { makeAccessJWT, validateJWT } from "./auth";
 import { hashPassword } from "./auth";
 import { comparePasswordHash } from "./auth";
 import { UnauthorizedError } from "../api/errors.js";
@@ -50,7 +50,7 @@ describe("JWT Functions", () => {
   let validToken: string;
 
   beforeAll(() => {
-    validToken = makeJWT(userID, 3600, secret);
+    validToken = makeAccessJWT(userID, 3600, secret);
   });
 
   it("should validate a valid token", () => {
