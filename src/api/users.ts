@@ -1,9 +1,10 @@
 import { Request, RequestHandler, Response } from "express";
 import { respondWithError, respondWithJSON } from "./json.js";
-import { createUser, getUserByEmail, getUserByRefreshToken, updateUserPassword } from "../db/queries/users.js";
+import { createUser, getUserByRefreshToken, updateUserParams } from "../db/queries/users.js";
 import { BadRequestError, UnauthorizedError } from "./errors.js";
-import { getBearerToken, hashPassword } from "../auth/auth.js";
+import { getBearerToken, hashPassword, validateJWT } from "../auth/auth.js";
 import { NewUser } from "../db/schema.js";
+import { config } from "../config.js";
 
 type UserResponse = Omit<NewUser, "passwordHash">;
 
@@ -27,7 +28,7 @@ export async function handlerUsers(req: Request, res: Response) {
     })
 
     if (!user) {
-    throw new Error("Could not create user");
+        throw new Error("Could not create user");
     }
 
     respondWithJSON(res, 201, {
@@ -44,25 +45,19 @@ export async function handlerUpdateUser(req: Request, res: Response) {
         password: string;
     };
 
-    const refreshToken = getBearerToken(req);
+    const params: jsonParams = req.body;
 
-    if (!refreshToken) {
+    const accessToken = getBearerToken(req);
+
+    if (!accessToken) {
         throw new UnauthorizedError("invalid access token")
     }
-    
-    const params: jsonParams = req.body;
-    
 
-    const eUser = await getUserByEmail(params.email)
-    const rUser = await getUserByRefreshToken(refreshToken)
+    const userID = validateJWT(accessToken, config.jwt.secret)
 
-    if (eUser.id !== rUser.user.id) {
-        throw new UnauthorizedError("refresh token does not match requested user")
-    }
+    const hashedPassword = await hashPassword(params.password)
 
-    const passwordHash =  await hashPassword(params.password)
-
-    const updatedUser = await updateUserPassword(params.email, passwordHash)
+    const updatedUser = await updateUserParams(userID, params.email, hashedPassword )
 
     respondWithJSON(res, 200, {
         id: updatedUser.id,

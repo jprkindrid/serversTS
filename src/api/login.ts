@@ -20,7 +20,7 @@ export async function handlerLogin(req: Request, res: Response) {
     }
 
     const params: jsonParams = req.body;
-    const user: User = await getUserByEmail(params.email)
+    const user = await getUserByEmail(params.email)
     const match = await comparePasswordHash(params.password, user.passwordHash)
     if (!match) {
         throw new UnauthorizedError("incorrect username or password")
