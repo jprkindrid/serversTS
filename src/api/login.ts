@@ -6,6 +6,7 @@ import bcrypt from "bcrypt"
 import { comparePasswordHash, makeAccessJWT, makeRefreshToken } from "../auth/auth.js";
 import { config } from "../config.js";
 import { insertRefreshToken } from "../db/queries/tokens.js";
+import { UnauthorizedError } from "./errors.js";
 
 type UserResponse = Omit<User, "passwordHash"> & {
     token: string
@@ -23,7 +24,7 @@ export async function handlerLogin(req: Request, res: Response) {
     const user: User = await getUserByEmail(params.email)
     const match = await comparePasswordHash(params.password, user.passwordHash)
     if (!match) {
-        respondWithError(res, 401, "Incorrect username or password")
+        throw new UnauthorizedError("incorrect username or password")
     }
     const accessTokenExpiration: number = 1000 * 60 * 60
     const refreshTokenExpiration: number = 1000 * 60 * 60 * 24 * 60 

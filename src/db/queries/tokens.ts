@@ -4,18 +4,18 @@ import { eq } from "drizzle-orm";
 
 export async function insertRefreshToken(token: NewRefreshToken): Promise<NewRefreshToken> {
     const [result] = await db.insert(refreshTokens).values(token).returning();
-    return result as NewRefreshToken
+    return result
 }
 
-export async function selectRefreshToken(token: string): Promise<RefreshToken> {
+export async function getRefreshToken(token: string): Promise<RefreshToken> {
     const [result] = await db.select().from(refreshTokens).where(eq(refreshTokens.token, token))
-    return result as RefreshToken
+    return result
 }
 
 export async function revokeRefreshToken(token: string): Promise<RefreshToken> {
     const now = new Date
     const [result] = await db.update(refreshTokens)
-    .set( {revokedAt: now})
+    .set( {revokedAt: now, updatedAt: now})
     .where(eq(refreshTokens.token, token))
     .returning();
 

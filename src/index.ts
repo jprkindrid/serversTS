@@ -7,6 +7,8 @@ import { handlerReset } from "./api/reset.js";
 import { handlerChirps, handlerGetChirps, handlerGetChirpID } from "./api/chirps.js";
 import { handlerUsers } from "./api/users.js";
 import { handlerLogin } from "./api/login.js";
+import { handlerRefresh } from "./api/refresh.js";
+import { handlderRevoke } from "./api/revoke.js";
 
 const app = express();
 const PORT = 8080;
@@ -42,10 +44,10 @@ app.post("/api/login", (req, res, next) => {
     Promise.resolve(handlerLogin(req, res)).catch(next)
 });
 app.post("/api/refresh", (req, res, next) => {
-    Promise.resolve(handlerLogin(req, res)).catch(next)
+    Promise.resolve(handlerRefresh(req, res)).catch(next)
 });
 app.post("/api/revoke", (req, res, next) => {
-    Promise.resolve(handlerLogin(req, res)).catch(next)
+    Promise.resolve(handlderRevoke(req, res)).catch(next)
 });
 
 

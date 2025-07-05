@@ -1,13 +1,14 @@
 import { Request, Response } from "express";
-import { getBearerToken } from "../auth/auth";
-import { revokeRefreshToken } from "../db/queries/tokens";
-import { respondWithError, respondWithJSON } from "./json";
+import { getBearerToken } from "../auth/auth.js";
+import { revokeRefreshToken } from "../db/queries/tokens.js";
+import { respondWithError, respondWithJSON } from "./json.js";
 
-export async function revokeHandler(req: Request, res: Response) {
+export async function handlderRevoke(req: Request, res: Response) {
     const bearerToken = getBearerToken(req)
     const revokedToken = await revokeRefreshToken(bearerToken)
-    if (revokedToken.revokedAt === null) {
-        respondWithError(res, 500, "error revoking refresh token")
+    if (!revokedToken) {
+        respondWithError(res, 401, "invalid refresh token")
+        return
     }
 
     respondWithJSON(res, 204, "")

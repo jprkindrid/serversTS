@@ -1,6 +1,7 @@
 import { eq } from "drizzle-orm";
 import { db } from "../index.js"
-import { NewUser, refreshTokens, User, users } from "../schema.js"
+import { NewUser, RefreshToken, refreshTokens, User, users } from "../schema.js"
+import { UnauthorizedError } from "../../api/errors.js";
 
 export async function createUser(user: NewUser) {
     const [result] = await db.insert(users)
@@ -21,6 +22,9 @@ export async function getUserByEmail(email: string){
 
 export async function getUserByRefreshToken(refreshToken: string): Promise<User> {
     const [rToken] = await db.select().from(refreshTokens).where(eq(refreshTokens.token, refreshToken));
+    if (!rToken) {
+        throw new UnauthorizedError("invalid refresh token")
+    }
     const [result] = await db.select().from(users).where(eq(users.id, rToken.userId));
-    return result as User
+    return result
 }

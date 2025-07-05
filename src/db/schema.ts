@@ -31,8 +31,7 @@ export type NewChirp = typeof chirps.$inferInsert;
 export type Chirp = typeof chirps.$inferSelect;
 
 export const refreshTokens = pgTable("refresh_tokens", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  token: text("token").notNull(),
+  token: text("token").primaryKey().notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at")
     .notNull()
