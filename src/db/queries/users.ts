@@ -1,7 +1,7 @@
-import { eq } from "drizzle-orm";
+import { eq, and, isNull, gt } from "drizzle-orm";
 import { db } from "../index.js"
 import { NewUser, RefreshToken, refreshTokens, User, users } from "../schema.js"
-import { UnauthorizedError } from "../../api/errors.js";
+import { InternalServerError, UnauthorizedError } from "../../api/errors.js";
 
 export async function createUser(user: NewUser) {
     const [result] = await db.insert(users)
@@ -20,11 +20,31 @@ export async function getUserByEmail(email: string){
     return result
 }
 
-export async function getUserByRefreshToken(refreshToken: string): Promise<User> {
-    const [rToken] = await db.select().from(refreshTokens).where(eq(refreshTokens.token, refreshToken));
-    if (!rToken) {
-        throw new UnauthorizedError("invalid refresh token")
+export async function getUserByRefreshToken(refreshToken: string) {
+    const [result] = await db.select({user: users})
+    .from(users)
+    .innerJoin(refreshTokens, eq(users.id, refreshTokens.userId))
+    .where(
+        and(
+            eq(refreshTokens.token, refreshToken),
+            isNull(refreshTokens.revokedAt),
+            gt(refreshTokens.expiresAt, new Date())
+        ),
+    )
+    .limit(1);
+    return result
+}
+
+export async function updateUserPassword(email: string, newPasswordHash: string) :Promise<User> {
+    const now =  new Date
+    const [result] = await db.update(users)
+    .set( {passwordHash: newPasswordHash, updatedAt: now})
+    .where(eq(users.email, email))
+    .returning();
+
+    if (!result) {
+        throw new InternalServerError("error updating user password")
     }
-    const [result] = await db.select().from(users).where(eq(users.id, rToken.userId));
+
     return result
 }

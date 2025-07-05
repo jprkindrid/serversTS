@@ -14,7 +14,7 @@ export async function handlerChirps(req: Request, res: Response) {
     const params: jsonParams = req.body;
     const cleanedBody = validateBody(params.body)
     const JWTToken = getBearerToken(req)
-    const userID = validateJWT(JWTToken, config.api.JWTSecret)
+    const userID = validateJWT(JWTToken, config.jwt.secret)
     const chirp = await createChirp({
         body: cleanedBody,
         userId: userID,
