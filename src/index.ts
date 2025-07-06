@@ -4,7 +4,7 @@ import { handlerReadiness } from "./api/readiness.js";
 import { middlewareErrorHandler, middlewareLogResponses, middlewareMetricsInc } from "./api/middleware.js";
 import { handlerMetrics } from "./api/metrics.js";
 import { handlerReset } from "./api/reset.js";
-import { handlerChirps, handlerGetChirps, handlerGetChirpID } from "./api/chirps.js";
+import { handlerChirps, handlerGetChirps, handlerGetChirpID, handlerDeleteChirpID } from "./api/chirps.js";
 import { handlerUpdateUser, handlerUsers } from "./api/users.js";
 import { handlerLogin } from "./api/login.js";
 import { handlerRefresh } from "./api/refresh.js";
@@ -36,6 +36,9 @@ app.get("/api/chirps", (req, res, next) => {
 });
 app.get("/api/chirps/:chirpID", (req, res, next) => {
     Promise.resolve(handlerGetChirpID(req, res)).catch(next)
+});
+app.delete("/api/chirps/:chirpID", (req, res, next) => {
+    Promise.resolve(handlerDeleteChirpID(req, res)).catch(next)
 });
 app.post("/api/users", (req, res, next) => {
     Promise.resolve(handlerUsers(req, res)).catch(next)

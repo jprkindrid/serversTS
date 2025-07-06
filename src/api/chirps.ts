@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { respondWithError, respondWithJSON } from "./json.js";
-import { BadRequestError } from "./errors.js";
-import { createChirp, getAllChirps, getChirpyById } from "../db/queries/chirps.js";
+import { BadRequestError, ForbiddenError, NotFoundError } from "./errors.js";
+import { createChirp, getAllChirps, getChirpyById, deleteChirpByID } from "../db/queries/chirps.js";
 import { Chirp } from "../db/schema.js";
 import { getBearerToken, validateJWT } from "../auth/auth.js";
 import { config } from "../config.js";
@@ -31,7 +31,36 @@ export async function handlerGetChirps(_: Request, res: Response) {
 export async function handlerGetChirpID(req: Request, res: Response) {
     const chirpID = req.params.chirpID
     const chirp = await getChirpyById(chirpID)
+
+    if (!chirp) {
+        throw new NotFoundError("chirp not found")
+    }
+    
     respondWithJSON(res, 200, chirp)
+}
+
+export async function handlerDeleteChirpID(req: Request, res: Response) {
+    const chirpID = req.params.chirpID;
+    const chirp = await getChirpyById(chirpID);
+
+    if (!chirp) {
+        throw new NotFoundError("chirp not found")
+    }
+
+    const accessToken = getBearerToken(req);
+    const userID = validateJWT(accessToken, config.jwt.secret)
+
+    if (userID !== chirp.userId) {
+        throw new ForbiddenError("user is not author of chirp")
+    }
+    
+    const deleted = await deleteChirpByID(chirpID)
+
+    if (!deleted) {
+        throw new Error("could not delete chirp")
+    }
+
+    res.status(204).end();
 }
 
 function validateBody(body: string) {
